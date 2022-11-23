@@ -1,9 +1,22 @@
-// Create package repositories here ...
+package repositories
 
-// Import the required packages here ...
+import (
+  "dumbmerch/models"
 
-// Declare ProfileRepository interface here ...
+  "gorm.io/gorm"
+)
 
-// Create RepositoryProfile function here ... 
+type ProfileRepository interface {
+  GetProfile(ID int) (models.Profile, error)
+}
 
-// Create GetProfile method here ...
+func RepositoryProfile(db *gorm.DB) *repository {
+  return &repository{db}
+}
+
+func (r *repository) GetProfile(ID int) (models.Profile, error) {
+  var profile models.Profile
+  err := r.db.Debug().Preload("User").First(&profile, ID).Error
+
+  return profile, err
+}
