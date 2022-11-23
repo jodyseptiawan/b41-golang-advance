@@ -22,4 +22,9 @@ func (r *repository) Register(user models.User) (models.User, error) {
 }
 
 // Create Login method here ...
-
+func (r *repository) Login(email string) (models.User, error) {
+	var user models.User
+	err := r.db.First(&user, "email=?", email).Error
+  
+	return user, err
+  }
