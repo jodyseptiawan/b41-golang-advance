@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-
+	"os"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
@@ -19,6 +19,7 @@ type handlerProduct struct {
 }
 
 // Create `path_file` Global variable here ...
+var path_file = os.Getenv("PATH_FILE")
 
 func HandlerProduct(ProductRepository repositories.ProductRepository) *handlerProduct {
 	return &handlerProduct{ProductRepository}
@@ -36,6 +37,9 @@ func (h *handlerProduct) FindProducts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create Embed Path File on Image property here ...
+	for i, p := range products {
+		products[i].Image = os.Getenv("PATH_FILE") + p.Image
+	  }
 
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Code: http.StatusOK, Data: products}
@@ -57,6 +61,7 @@ func (h *handlerProduct) GetProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create Embed Path File on Image property here ...
+	product.Image = os.Getenv("PATH_FILE") + product.Image
 
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Code: http.StatusOK, Data: convertResponseProduct(product)}
@@ -71,6 +76,8 @@ func (h *handlerProduct) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	userId := int(userInfo["id"].(float64))
 
 	// Get dataFile from midleware and store to filename variable here ...
+	dataContex := r.Context().Value("dataFile") // add this code
+	filename := dataContex.(string) // add this code
 
 	price, _ := strconv.Atoi(r.FormValue("price"))
 	qty, _ := strconv.Atoi(r.FormValue("qty"))
@@ -101,7 +108,6 @@ func (h *handlerProduct) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		UserID: userId,
 	}
 
-	// err := mysql.DB.Create(&product).Error
 	product, err = h.ProductRepository.CreateProduct(product)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

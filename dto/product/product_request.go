@@ -5,5 +5,5 @@ type ProductRequest struct {
 	Desc       string `json:"desc" gorm:"type:text" form:"desc" validate:"required"`
 	Price      int    `json:"price" form:"price" gorm:"type: int" validate:"required"`
 	Qty        int    `json:"qty" form:"qty" gorm:"type: int" validate:"required"`
-	CategoryID int    `json:"category_id" form:"category_id" gorm:"type: int" validate:"required"`
+	CategoryID int    `json:"category_id" form:"category_id" gorm:"type: int"`
 }
